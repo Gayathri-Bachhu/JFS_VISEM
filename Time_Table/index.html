@@ -36,6 +36,11 @@
             padding: 6px 10px;
             margin: 5px;
         }
+        /* 🔥 Highlight style */
+        .highlight {
+            background-color: yellow;
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -48,7 +53,7 @@
 <br><br>
 
 <label><b>Enter Faculty Name:</b></label>
-<input type="text" id="facultySearch" placeholder="Type faculty name">
+<input type="text" id="facultySearch" placeholder="Type faculty name or All">
 <button onclick="searchFaculty()">Search</button>
 
 <div id="tables">
@@ -86,8 +91,18 @@ function processCSV(data) {
             timetable[faculty][day] = { FN: "", AN: "" };
         }
 
-        timetable[faculty][day][session] =
-            `Batch: ${batch}<br>${course}<br>Room: ${room}`;
+        // 🔥 Highlight VI-SU-B2
+        let content = `
+            Batch: ${batch}<br>
+            ${course}<br>
+            Room: ${room}
+        `;
+
+        if (batch === "VI-SU-B2") {
+            content = `<div class="highlight">${content}</div>`;
+        }
+
+        timetable[faculty][day][session] = content;
     });
 
     fullTimetable = timetable;
@@ -100,6 +115,12 @@ function searchFaculty() {
 
     if (!name) {
         container.innerHTML = `<div class="msg">Please enter faculty name</div>`;
+        return;
+    }
+
+    // ✅ If ALL → show all faculty
+    if (name === "all") {
+        buildTables(fullTimetable);
         return;
     }
 
