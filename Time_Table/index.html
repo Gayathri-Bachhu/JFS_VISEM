@@ -36,7 +36,6 @@
             padding: 6px 10px;
             margin: 5px;
         }
-        /* 🔥 Highlight style */
         .highlight {
             background-color: yellow;
             font-weight: bold;
@@ -77,12 +76,13 @@ function processCSV(data) {
     const timetable = {};
 
     data.forEach(row => {
-        const faculty = row["FACULTY"];
-        const day = row["DAY"];
-        const session = row["SESSION"];
-        const batch = row["BATCH"];
-        const course = row["COURSE"];
-        const room = row["ROOM"];
+        // ✅ SAFE header reading (handles case & spaces)
+        const faculty = row["FACULTY"] || row["Faculty"] || row["faculty"];
+        const day = row["DAY"] || row["Day"] || row["day"];
+        const session = row["SESSION"] || row["Session"] || row["session"];
+        const batch = row["BATCH"] || row["Batch"] || row["batch"];
+        const course = row["COURSE"] || row["Course"] || row["course"];
+        const room = row["ROOM"] || row["Room"] || row["room"];
 
         if (!faculty || !day || !session) return;
 
@@ -91,13 +91,13 @@ function processCSV(data) {
             timetable[faculty][day] = { FN: "", AN: "" };
         }
 
-        // 🔥 Highlight VI-SU-B2
         let content = `
             Batch: ${batch}<br>
             ${course}<br>
             Room: ${room}
         `;
 
+        // 🔥 Highlight specific batch
         if (batch === "VI-SU-B2") {
             content = `<div class="highlight">${content}</div>`;
         }
@@ -106,6 +106,7 @@ function processCSV(data) {
     });
 
     fullTimetable = timetable;
+    console.log("Loaded timetable:", fullTimetable);
 }
 
 function searchFaculty() {
@@ -118,14 +119,13 @@ function searchFaculty() {
         return;
     }
 
-    // ✅ If ALL → show all faculty
+    // ✅ ALL faculty
     if (name === "all") {
         buildTables(fullTimetable);
         return;
     }
 
     const filtered = {};
-
     for (const faculty in fullTimetable) {
         if (faculty.toLowerCase() === name) {
             filtered[faculty] = fullTimetable[faculty];
